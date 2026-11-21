@@ -1,0 +1,33 @@
+name: Build DIPTO AI APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-new.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build APK
+        run: |
+          unzip -o DIPTO_AI_CALL_ASSISTANT_SOURCE.zip -d source
+          cd source
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DIPTO-AI-APK
+          path: source/app/build/outputs/apk/debug/*.apk
