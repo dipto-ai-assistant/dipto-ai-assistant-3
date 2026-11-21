@@ -21,7 +21,7 @@ jobs:
 
       - name: Build APK
         run: |
-          unzip -o DIPTO_AI_CALL_ASSISTANT_SOURCE.zip -d source
+         unzip -o 'DIPTO_AI_CALL_ASSISTANT_SOURCE(1).zip' -d source
           cd source
           chmod +x gradlew
           ./gradlew assembleDebug
