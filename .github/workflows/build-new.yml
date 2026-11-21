@@ -1,73 +1,45 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
 
-name: Build DIPTO AI APK
+android {
+    namespace = "com.dipto.aiassistant"
+    compileSdk = 35
 
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/build-new.yml'
+    defaultConfig {
+        applicationId = "com.dipto.aiassistant"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+    }
 
-permissions:
-  contents: read
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
-jobs:
-  build:
-    name: Build Android APK
-    runs-on: ubuntu-latest
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    buildFeatures {
+        compose = true
+    }
+}
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+dependencies {
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.activity:activity-compose:1.9.3")
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 
-      - name: Extract Source ZIP
-        run: |
-          ZIP_FILE=$(find . -maxdepth 1 -type f -iname 'DIPTO_AI_CALL_ASSISTANT_SOURCE*.zip' -print -quit)
-
-          if [ -z "$ZIP_FILE" ]; then
-            echo "ERROR: Source ZIP not found!"
-            ls -la
-            exit 1
-          fi
-
-          echo "Found ZIP: $ZIP_FILE"
-          mkdir -p source
-          unzip -o "$ZIP_FILE" -d source
-
-      - name: Locate Android Project
-        id: project
-        run: |
-          SETTINGS_FILE=$(find source -name settings.gradle.kts -print -quit)
-
-          if [ -z "$SETTINGS_FILE" ]; then
-            echo "ERROR: settings.gradle.kts not found!"
-            find source -maxdepth 4 -type f
-            exit 1
-          fi
-
-          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Project found: $PROJECT_DIR"
-
-      - name: Build Debug APK
-        run: |
-          cd "$PROJECT_DIR"
-          gradle assembleDebug --stacktrace
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DIPTO-AI-CALL-ASSISTANT-APK
-          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 
+    debugImplementation("androidx.compose.ui:ui-tooling")
+}
