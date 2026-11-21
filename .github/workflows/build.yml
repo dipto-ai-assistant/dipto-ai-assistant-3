@@ -1,0 +1,42 @@
+
+name: DIPTO AI APK Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract starter ZIP
+        run: |
+          unzip -o dipto-ai-assistant-2-starter.zip -d extracted
+          find extracted -type f
+          find extracted -name settings.gradle.kts
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
+        run: |
+          cd extracted
+          PROJECT=$(find . -name settings.gradle.kts -printf '%h\n' | head -1)
+          cd "$PROJECT"
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DIPTO-AI-APK
+          path: extracted/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
