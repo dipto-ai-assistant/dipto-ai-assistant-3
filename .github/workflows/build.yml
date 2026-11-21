@@ -19,8 +19,7 @@ jobs:
           java-version: '17'
 
       - name: Extract ZIP
-        run: unzip -o dipto-ai-assistant-2-starter.zip -d extracted
-
+        run: unzip -o dipto-ai-assistant-2-ui-fixed.zip -d extracted
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
